@@ -94,8 +94,17 @@ no_of_rows
 Plot histograms of all the quantitative variables in a **single plot** [^footnote_facet_wrap]
 
 ```{R}
-library(ggplot2)
 
+ggplot(df) +
+  geom_histogram(aes(x=length), alpha=0.6, fill = 'red') +
+  geom_histogram(aes(x=diameter), alpha=0.6, fill = 'blue') +
+  geom_histogram(aes(x=height), alpha=0.6, fill = 'green') +
+  geom_histogram(aes(x=whole_weight), alpha=0.6, fill = 'aquamarine') +
+  geom_histogram(aes(x=shucked_weight), alpha=0.6, fill = 'purple') +
+  geom_histogram(aes(x=viscera_weight), alpha=0.6, fill = 'yellow') +
+  geom_histogram(aes(x=shell_weight), alpha=0.6, fill = 'black') +
+  geom_histogram(aes(x=rings), alpha=0.6, fill = 'maroon') +
+  facet_wrap(~sex, nrow=2)
 ```
 
 
@@ -105,13 +114,43 @@ library(ggplot2)
 
 Create a boxplot of `length` for each `sex` and create a violin-plot of of `diameter` for each `sex`. Are there any notable differences in the physical appearences of abalones based on your analysis here?
 
-```R
-... # Insert your code for boxplot here
+```{R}
+library(ggplot2)
+ggplot(
+  data = df,
+  mapping = aes(x = sex, y = length)
+) +
+  geom_boxplot(fill = "cadetblue1") + # Add color
+  theme_bw() +
+  ylab("Length") +
+  xlab("Sex") +
+  theme(
+    text = element_text(size = 12) # Change the base font size
+  ) +
+  ggtitle("Side-by-side Box Plot of Length by Sex") # Add title
+
+
 ```
 
-```R
-... # Insert your code for violinplot here
+```{R}
+library(ggplot2)
+ggplot(
+  data = df,
+  mapping = aes(x = sex, y = diameter)
+) +
+  geom_violin(fill = "cornflowerblue") +
+  theme_bw() +
+  ylab("Diameter") + 
+  xlab("Sex") + 
+  theme(
+    text = element_text(size = 12) 
+  ) +
+  ggtitle("Side-by-side Violin Plot of Diamaeter by Sex")
+
 ```
+
+We can observe that how the length and diameter variables are distributed among each sex using the boxplot and violin plot. The boxplot of length reveals that male abalones have bigger median lengths than female and infant abalones. Whereas the violin plot shows that the diameters of male abalones tend to be larger than those of female and infant abalones. From these plots, one can see notable differences in the physical appearances of abalones. Hence, these differences in the distribution of physical appearance could indicate that the abalones are physically distinct based on their sex.
+
 
 
 ---
@@ -122,8 +161,21 @@ Create a scatter plot of `length` and `diameter`, and modify the shape and color
 
 
 
-```R
-... # Insert your code here
+```{R}
+library(ggplot2)
+G <- ggplot(
+  data = df,
+  mapping = aes(x=length, y=diameter, shape=sex, color=sex, size=shell_weight)
+) +
+  geom_point()
+  scale_size_continuous(range = c(1,10)) 
+  
+G + ylab("Diamter") + 
+    xlab("Length") +
+    theme(
+      text = element_text(size = 12) 
+) + 
+    ggtitle("Scatter plot of Diameter by Length")
 ```
 
 ---
@@ -133,11 +185,21 @@ Create a scatter plot of `length` and `diameter`, and modify the shape and color
 For each `sex`, create separate scatter plots of `length` and `diameter`. For each plot, also add a **linear** trendline to illustrate the relationship between the variables. Use the `facet_wrap()` function in R for this, and ensure that the plots are vertically stacked **not** horizontally. You should end up with a plot that looks like this: [^footnote_plot_facet]
 
 
-```R
-... # Insert your code here
+```{R}
+library(ggplot2)
+ggplot(
+  data = df, 
+  aes(x = length, y = diameter)) +
+  geom_point(aes(color = sex)) +
+  geom_smooth(aes(group = sex), method = "lm") +
+  facet_wrap(~ sex, ncol = 1) +
+  ylab("Diameter") + 
+  xlab("Length") + 
+  theme(
+    text = element_text(size = 12)) +
+  ggtitle("Scatter Plot of Length and Diameter by Sex with a linear trend")
+
 ```
-
-
 
 
 
@@ -159,8 +221,31 @@ More advanced analyses using `dplyr`, `purrrr` and `ggplot2`
 Filter the data to only include abalone with a length of at least $0.5$ meters. Group the data by `sex` and calculate the mean of each variable for each group. Create a bar plot to visualize the mean values for each variable by `sex`.
 
 
-```R
-df %>% ... # Insert your code here
+```{R}
+# Filtering that data to include a length of at least 0.5 meters.
+df_filtered_grouped <- df %>% 
+                        filter(length >= 0.5) %>%
+                        group_by(sex) %>%
+                        summarise_all(mean)
+df_filtered_grouped
+# Creating a bar plot to visualize the mean values for each variable by `sex`
+ggplot(
+  data = df_filtered_grouped) +
+  geom_col(aes(x = sex, y = length, fill = sex)) + 
+  geom_col(aes(x = sex, y = diameter, fill = sex)) + 
+  geom_col(aes(x = sex, y = height, fill = sex)) + 
+  geom_col(aes(x = sex, y = whole_weight, fill = sex)) + 
+  geom_col(aes(x = sex, y = shucked_weight, fill = sex)) +
+  geom_col(aes(x = sex, y = viscera_weight, fill = sex)) + 
+  geom_col(aes(x = sex, y = shell_weight, fill = sex)) + 
+  ylab("Mean Value") + 
+  theme(
+    text = element_text(size = 12)
+  ) + 
+  ggtitle("Bar Plot")
+
+
+
 ```
 
 
